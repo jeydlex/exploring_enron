@@ -1,0 +1,18 @@
+#THis asumes I have mongodb installed - 2016
+
+#create a new database in mongodb using the enron.json - The database will be called enron and the collection enron_inbox because
+#the script only parsed the inbox, which is what I need right now. 
+
+mongoimport --db enron --collection enron_inbox --drop --file enron.json
+
+#create a new collection and importing it...
+
+#connect to the database
+conn = new Mongo()
+db = conn.getDB("messages")
+
+#show databases
+show dbs 
+
+#use one in a collection
+db.enron.findOne.pretty()
