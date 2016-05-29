@@ -1,0 +1,68 @@
+1. I need to find the pairs of people that talk among themselves. I need to include the date, and the id of the mail...
+
+2. The second part of preprocessing the text can be done by exporting the message_id first and the text in the message (including subject field later) and then preprocessing it in a different step. First thing, finding the pairs of people.
+
+db.inbox_enron.aggregate([
+    {$project: { 
+       id: 1,
+       From: 1,
+       To:1,
+     }},
+    { $unwind: '$To' },
+
+    { $limit : 1 }
+])
+
+db.inbox_enron.aggregate([
+  { $unwind: '$To' },
+  { $group: { _id: '$_id', To: { $addToSet: '$To' } } },
+  { $limit : 1 }
+]);
+
+
+#somehow this query creates a new id once this is made... the one that is #valid for me is Cod as this represents the original message sent by the 
+#person
+
+db.inbox_enron.aggregate( [ 
+	{ $unwind : "$To" },   
+	{$project: {
+	   _id: 0,
+           Cod: '$_id', 
+           From: 1,
+           To:1,
+     }},
+        {$out : "users_pairs" }
+] )
+
+#exporting to csv file
+mongoexport --db enron --collection users_pairs --type=csv --fields Cod,From,To --out users_pairs.csv
+
+
+
+#This is to find all the emails and their codes in order to preprocess the text
+db.inbox_enron.aggregate( [
+	{$unwind: "$parts"},    
+	{$project: {
+	   _id: 0,
+           Cod: '$_id', 
+           From: 1,
+           Subject:1,
+	   Date:1,
+	   email: "$parts.content",
+     }},
+        { $out : "emails" }
+] )
+
+
+db.sample.aggregate([
+    {$unwind: "$data"},
+    {$project: { 
+       page_id: 1,
+       item_name: "$data.item_name",
+       last_updated_utc: 1
+     }}
+])
+
+
+mongoexport --db enron --collection emails --type=csv --fields Date,Subject,Cod,email --out emails.csv
+
