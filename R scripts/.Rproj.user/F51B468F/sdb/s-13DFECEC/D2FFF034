@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(dplyr) \nlibrary(tm) \nlibrary(SnowballC) \nlibrary(ggplot2)\n\ndata <- read.csv(file=\"data/emails.csv\", head=TRUE, sep=\",\")\n\n#Trying with 10 emails only\ndocs <-select(data, email) #I had to filter it again because there is some trash in the data\ndocs.subset <- head(docs,500) #in case I need to try things out\nemails<-Corpus(VectorSource(docs$email))\n\n#PREPROCESSING TEXT OPERATIONS\n      #To lower case\n      myCorpus <- tm_map(emails, content_transformer(tolower))\n      \n      # remove punctuation\n      myCorpus <- tm_map(myCorpus, removePunctuation) \n      \n      # remove numbers\n      myCorpus <- tm_map(myCorpus, removeNumbers)\n      \n      # remove URLs\n      removeURL <- function(x) gsub(\"http[[:alnum:]]*\", \"\", x)\n      myCorpus <- tm_map(myCorpus, content_transformer(removeURL))\n\n      #removing stop words\n      myCorpus <- tm_map(myCorpus, removeWords, stopwords(\"english\"))\n\n      myStopwords <- c('enron', 'subject', 'www', 'com', 'http', 'https', 'cc', 'message', 'sent', 're', 'ect', 'etc', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'll', 'am', 'pm')\n      myCorpus <- tm_map(myCorpus, removeWords, myStopwords)\n\n      #To inspect the corpus anytime I want\nfor (i in 1:5) {\n  cat(paste(\"[[\", i, \"]] \", sep = \"\"))\n  #writeLines(myCorpus[[i]])\n  writeLines(as.character(processed.corpus[[i]]))\n}\n      \n      #stemming the emails\n      myCorpus <- tm_map(myCorpus, stemDocument)\n      \n      #remove unnecessary white space\n      myCorpus <- tm_map(myCorpus, stripWhitespace)\n      \n      #telling R we preprocessed text documents\n      processed.corpus <- tm_map(myCorpus, PlainTextDocument) \n      \n      #creating a new dataframe and then joing it with the original data\n      texto <- data.frame(text=sapply(processed.corpus, `[[`, \"content\"), stringsAsFactors=FALSE)\n      data$processed_text <- texto$text\n      \n      #the preprocessed text must be of at least 3 words length\n      final.data <- filter(data, (sapply(gregexpr(\"[A-z]\\\\W+\", data$processed_text), length) + 1L)>=3)\n      \n      final.data$id<-seq.int(nrow(final.data)) #This is used to add ids to the relationships for gephi\n\n      emails.to.export <- select(final.data, Cod, processed_text)\n      #EXPORTING THE DATA ONCE PROCESSED \n\nwrite.table(emails.to.export, file=\"data/clean_emails.csv\", row.names=FALSE, sep=\",\")\n",
+    "created" : 1464512930651.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "858527854",
+    "id" : "D2FFF034",
+    "lastKnownWriteTime" : 1462762784,
+    "last_content_update" : 1462762784,
+    "path" : "~/exploring_enron/R scripts/preprocessing_emails.R",
+    "project_path" : "preprocessing_emails.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

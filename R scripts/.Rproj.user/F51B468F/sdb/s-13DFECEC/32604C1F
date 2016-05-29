@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#Here I create a single document with the emails that I wanted to preprocess\nlibrary(ggplot2)\n\nstats.edges <- read.csv(file=\"data/sentiment/graph_data_with_manual_sentiment.csv\", head=TRUE, sep=\",\")\nstats.sentiment <- read.csv(file=\"data/sentiment/sentiment_prediction_10733_emails.csv\", head=TRUE, sep=\",\")\n# 3: positive, 2:neutral, 1:negative\n\n#1. BARPLOT FOR EDGES IN THE NETWORK - over 67 thousand\n#source: http://www.cookbook-r.com/Graphs/Colors_%28ggplot2%29/\nedges <- ggplot(stats.edges, aes(x = factor(sentiment),fill=factor(sentiment))) + geom_bar(stat = \"count\") \nedges.color <- edges + scale_fill_brewer(palette=\"Paired\") + xlab(\"Sentiment\") + ylab(\"Edges count\") \nedges.color + scale_fill_discrete(name=\"Network\\nSentiment\", breaks=c(\"3\", \"2\", \"1\"), labels=c(\"Positive\", \"Neutral\", \"Negative\"))\n\n#2. BARPLOT FOR SENTIMENT IN MESSAGES - only 10 thousand emails\nemails <- ggplot(stats.sentiment, aes(x = factor(sentiment), fill=factor(sentiment))) + geom_bar(stat = \"count\") \nemails.color <- emails + scale_fill_brewer(palette=\"Paired\") + xlab(\"Sentiment\") + ylab(\"Emails\") \nemails.color + scale_fill_discrete(name=\"Network\\nSentiment\", breaks=c(\"3\", \"2\", \"1\"), labels=c(\"Positive\", \"Neutral\", \"Negative\"))\n\n#FINDINGS: Neutral messages are the predominant type in the data, but despite having a lot of negative\n#emails and a few positive ones, negative emails were sent to less people than positive ones. \n",
+    "created" : 1464525788074.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3105562911",
+    "id" : "32604C1F",
+    "lastKnownWriteTime" : 1464530547,
+    "last_content_update" : 1464530547438,
+    "path" : "~/exploring_enron/R scripts/stats for manual sentiment.R",
+    "project_path" : "stats for manual sentiment.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

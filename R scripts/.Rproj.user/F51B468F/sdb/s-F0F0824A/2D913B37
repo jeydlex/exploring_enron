@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(foreign) \n\n#Making a single table to show the sentiment for each email\ns1 <- read.csv(file=\"data/sentiment/manual_sent1.csv\", head=TRUE, sep=\",\")\ns2 <- read.csv(file=\"data/sentiment/manual_sent2.csv\", head=TRUE, sep=\",\")\n\n  #uniendo ambos dataframes para poder \n  data.sent <- rbind(s1,s2)\n\n#Plotting the data\ncounts <- table(data.sent$sentiment)\n  barplot(counts, main=\"Sentiment distribution\",\n          xlab=\"Type of sentiment\") \n    \nwrite.table(data.sent, file=\"data/data_with_sentiment_may.csv\", row.names=FALSE, sep=\",\")  \n\n#SENTIMENT ANALYSIS\n\n\nlibrary(RTextTools)\nlibrary(e1071)\n\ndata.sent <- read.csv(file=\"data/sentiment/enron_sent_may.csv\", head=TRUE, sep=\",\")\n\nmatrix= create_matrix(data.sent[,1], language=\"english\", \n                      removeStopwords=FALSE, removeNumbers=TRUE, \n                      stemWords=FALSE, tm::weightTfIdf) \nmat = as.matrix(matrix)\nclassifier = naiveBayes(mat[1:640,], as.factor(data.sent[1:640,2]) )\n\npredicted = predict(classifier, mat[641:799,]); \npredicted\ntable(data.sent[641:799, 2], predicted)\nrecall_accuracy(data.sent[641:799, 2], predicted)\n\n\ndata.sent[1:640,2]\n",
+    "created" : 1464149358425.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "371151223",
+    "id" : "2D913B37",
+    "lastKnownWriteTime" : 1464417004,
+    "last_content_update" : 1464417005238,
+    "path" : "~/exploring_enron/R scripts/sentiment_emails_May_2016.R",
+    "project_path" : "sentiment_emails_May_2016.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(RTextTools)\nlibrary(e1071)\n\nenron.emails <- read.csv(file=\"data/enron_emails_top_users.csv\", head=TRUE, sep=\",\")\ndata.sent <- read.csv(file=\"data/sentiment/enron_sent_may.csv\", head=FALSE, sep=\",\")\n\n#creating a term matrix from all the data\nmatrix= create_matrix(data.sent[,1], language=\"english\", \n                      removeStopwords=FALSE, removeNumbers=TRUE, \n                      stemWords=FALSE, tm::weightTfIdf) \n\n#CREATE A container that is split in training and testing set - if I erase \"as.numeric\" then \n#label names appear, but it will produce a mistake for testing results... easy to fix :) \n#container = create_container(matrix, as.numeric((data.sent[, 2])), trainSize = 1:640, testSize=641:800, virgin = FALSE)  #removeSparseTerms\ncontainer = create_container(matrix, (data.sent[, 2]), trainSize = 1:640, testSize=641:800, virgin = FALSE)  #removeSparseTerms\n\n#Training and classifying\nsvm.model <- train_model(container,\"SVM\")\nsvm.results <- classify_model(container,svm.model) #classifying to see accuracy\n\n#ACCURACY\nrecall_accuracy(as.numeric(as.factor(data.sent[641:800, 2])), svm.results[, \"SVM_LABEL\"]) # 0.7672956\ntable(as.factor(data.sent[641:800,2]), svm.results[, \"SVM_LABEL\"])\n#Very interesting about results http://stats.stackexchange.com/questions/62621/recall-and-precision-in-classification\n\n# VIEW THE RESULTS BY CREATING ANALYTICS\nanalytics <- create_analytics(container, svm.results)\nhead(analytics@algorithm_summary)\nhead(analytics@label_summary)\nhead(analytics@document_summary)\nhead(analytics@ensemble_summary)\n\n#TESTING THE CLASSIFIER ON THE INITIAL 100 TUPLES IN THE TRAINING SET, WITHOUT LABELS\ndata.test <- read.csv(file=\"data/sentiment/test.csv\", head=TRUE, sep=\",\")\nnew_matrix <- create_matrix(data.test[,1], language=\"english\", \n                      removeStopwords=FALSE, removeNumbers=TRUE, \n                      stemWords=FALSE, tm::weightTfIdf, originalMatrix=matrix) \n\npredSize <-length(data.test$text);\npredictionContainer <- create_container(new_matrix, labels=rep(0,predSize), testSize=1:predSize, virgin=FALSE)\n\n    #Classification results\n    results <- classify_model(predictionContainer, svm.model) \n\n#TESTING THE CLASSIFIER ON TOTALLY NEW DATA - FROM ROW 800 TO 900\nenron.test <- as.data.frame(enron.emails$processed_text[801:10733])\ncolnames(enron.test) <- c('text')\n\n#measuring time\nstart.time <- Sys.time()\n#beginning classfication\n    enron.test.matrix <- create_matrix(enron.test[,1], language=\"english\", \n                                removeStopwords=FALSE, removeNumbers=TRUE, \n                                stemWords=FALSE, tm::weightTfIdf, originalMatrix=matrix)\n    enron.test.size <- length(enron.test$text)\n    predict.enron.test <- create_container(enron.test.matrix, labels=rep(0,enron.test.size), testSize=1:enron.test.size, virgin=FALSE)\n    results.enron.test <- classify_model(predict.enron.test, svm.model) \n\n#end classifcation\nend.time <- Sys.time()\ntime.taken <- end.time - start.time\ntime.taken #2.780741 mins for almost 10 thousand elements\n\n#exporting sentiment\nwrite.table(results.enron.test, file=\"data/sentiment/sentiment_prediction_svm.csv\", row.names=FALSE, sep=\",\")\n\nsentiment <- as.data.frame(c(as.factor(data.sent$V2),results.enron.test$SVM_LABEL))\ncolnames(sentiment) <- c('sentiment')\nwrite.table(sentiment, file=\"data/sentiment/sentiment_prediction_10733_emails.csv\", row.names=FALSE, sep=\",\")\n\n#STATS: Checking the sentiment distribution in the end\n\n",
+    "created" : 1464443312980.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "730828957",
+    "id" : "1FF3AA7D",
+    "lastKnownWriteTime" : 1464530587,
+    "last_content_update" : 1464530587682,
+    "path" : "~/exploring_enron/R scripts/SVM_CLASSIFIER.R",
+    "project_path" : "SVM_CLASSIFIER.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

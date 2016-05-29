@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(dplyr) \n\n#Here I create a single document with the emails that I wanted to preprocess\n\nclean <- read.csv(file=\"data/clean_emails.csv\", head=TRUE, sep=\",\")\ngraph <- read.csv(file=\"data/graph_with_id.csv\", head=TRUE, sep=\",\")\ncolnames(graph) <- c('source', 'target', 'label', 'id')\n\nunique_mails <- distinct(select(graph, label)) #10 thousand emails...uhmm a lot\ncolnames(unique_mails) <- c('Cod')\n\n    #This are the emails that I will really need to preprocess and get the sentiment from\n    emails.to.process <- filter(clean, Cod %in% unique_mails$Cod)\n    write.table(emails.to.process, file=\"data/enron_emails_top_users.csv\", row.names=FALSE, sep=\",\")\n\n#NEED TO CREATE A SUBSET OF THESE EMAILS IN ORDER TO ANNOTATE THEM MANUALLY \n#AND TEST THE NAIVE BAYES CLASSIFIER\n    \nsubset.emails <- head(emails.to.process,1000)\nwrite.table(subset.emails, file=\"data/subset_enron_emails_top_1000_users.csv\", row.names=FALSE, sep=\",\")\n    \n#Making a single table to show the sentiment for each email\ns1 <- read.csv(file=\"data/sentiment/sentiment_first_3000.csv\", head=FALSE, sep=\",\")\ns2 <- read.csv(file=\"data/sentiment/sentiment_last_7000.csv\", head=FALSE, sep=\",\")\n\nvalue <-  as.data.frame(c('pos'))\ncolnames(value) <- c('V1')\n\ns3 <- rbind(s1,value)\nsentiment <- rbind(s3,s2)\ncolnames(sentiment) <- c('sentiment')\n\n#Putting the pieces together... first add the sentiment for each email\ndata.with.sentiment <- cbind(emails.to.process, sentiment)\n\n#now I need to put the clean data for the graph with its own sentiment\nuniendo <- inner_join(graph, data.with.sentiment, by ='Cod')\ncolnames(uniendo) <- c('source', 'target', 'label', 'id', 'email', 'sentiment')\nenron.data <- select(uniendo, source, target, id, label,sentiment)\n\nwrite.table(enron.data, file=\"data/graph_data_with_sentiment.csv\", row.names=FALSE, sep=\",\")\n",
+    "created" : 1464149348276.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2083617232",
+    "id" : "503303CB",
+    "lastKnownWriteTime" : 1464007928,
+    "last_content_update" : 1464007928,
+    "path" : "~/exploring_enron/R scripts/text_to_preprocess.R",
+    "project_path" : "text_to_preprocess.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

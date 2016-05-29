@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(RTextTools)\nlibrary(e1071)\n\ndata.sent <- read.csv(file=\"data/sentiment/enron_sent_may.csv\", head=FALSE, sep=\",\")\n\nmatrix= create_matrix(data.sent[,1], language=\"english\", \n                      removeStopwords=FALSE, removeNumbers=TRUE, \n                      stemWords=FALSE, tm::weightTfIdf) \n\n#NAIVE BAYES CLASSIFIER\nmat = as.matrix(matrix)\nclassifier1 = naiveBayes(mat[1:640,], as.factor(data.sent[1:640,2]) )\n\npredicted = predict(classifier, mat[641:799,]); \npredicted\ntable(data.sent[641:799, 2], predicted)\nrecall_accuracy(data.sent[641:800, 2], predicted)\n\n# the other methods\ncontainer = create_container(matrix, as.numeric(as.factor(data.sent[, 2])), trainSize = 1:640, \n                             testSize = 641:800, virgin = FALSE)  #removeSparseTerms\n\nmodels = train_models(container, algorithms = c(\"MAXENT\", \"SVM\"))\n\n\n#SUPPORT VECTOR MACHINES\nresults = classify_models(container, models)\nrecall_accuracy(as.numeric(as.factor(data.sent[641:800, 2])), results[, \"SVM_LABEL\"])\n    # accuracy: 0.7672956\n    table(as.factor(data.sent[641:800,2]), results[, \"SVM_LABEL\"])\n\n#the specific classifier for SVM - checked help to find example\nsvm.model <- train_model(container,\"SVM\")\nsvm.results <- classify_model(container,svm.model)\nprecision_recall_f1 <- create_precisionRecallSummary(container, results)\n    \n#trying the classifier on new data\nnew_strings <- c(\"attached the report\", \"one final note   deeply sorry live uncertain troubled period company  saddened\")\nnew_matrix <- create_matrix(new_strings, language=\"english\",\n                            removeNumbers=TRUE, stemWords=TRUE, weighting=tm::weightTfIdf, originalMatrix = NULL)\n\n\n\nresults <- classify_models(new_corpus, model1) \n    \n#MAXENT \nrecall_accuracy(as.numeric(as.factor(data.sent[641:799, 2])), results[, \"MAXENTROPY_LABEL\"])\n    #0.6477987\n    table(as.factor(data.sent[641:799,2]), results[, \"MAXENTROPY_LABEL\"])\n\n# model summary\nanalytics = create_analytics(container, results)\nsummary(analytics)\n",
+    "created" : 1464007953726.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1762648014",
+    "id" : "4BA2BF14",
+    "lastKnownWriteTime" : 1464443306,
+    "last_content_update" : 1464443306688,
+    "path" : "~/exploring_enron/R scripts/sentiment_emails_May_2016.R",
+    "project_path" : "sentiment_emails_May_2016.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
